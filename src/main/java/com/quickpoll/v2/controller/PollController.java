@@ -1,14 +1,15 @@
-package com.quickpoll.controller;
+package com.quickpoll.v2.controller;
 
 import java.net.URI;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,20 +18,22 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.quickpoll.domain.Poll;
-import com.quickpoll.exception.ResourceNotFoundException;
 import com.quickpoll.repository.PollRepository;
 
-@RestController
+@RestController("pollControllerV2")
+@RequestMapping("/v2/")
 public class PollController {
 
 	@Autowired
 	private PollRepository pollRepository;
 	
 	@RequestMapping(value="/polls", method=RequestMethod.GET)
-	public ResponseEntity<Iterable<Poll>> getAllPolls() {
-	        Iterable<Poll> allPolls = pollRepository.findAll();
-	        return new ResponseEntity<>(pollRepository.findAll(), HttpStatus.OK);
+	//@ApiOperation(value = "Retrieves all the polls", response=Poll.class, responseContainer="List")
+	public ResponseEntity<Page<Poll>> getAllPolls(Pageable pageable) {
+	        Page<Poll> allPolls = pollRepository.findAll(pageable);
+	        return new ResponseEntity<>(allPolls, HttpStatus.OK);
 	}
+
 	
 	@RequestMapping(value="/polls", method=RequestMethod.POST)
 	public ResponseEntity<?> createPoll(@Valid @RequestBody Poll poll) {
